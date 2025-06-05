@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Innovatopia</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #ideas { margin-top: 20px; }
+    .idea { border-bottom: 1px solid #ccc; padding: 10px 0; }
+  </style>
+</head>
+<body>
+  <h1>Innovatopia</h1>
+  <form id="ideaForm">
+    <input type="text" id="title" placeholder="Idea title" required />
+    <input type="text" id="description" placeholder="Description" />
+    <button type="submit">Submit</button>
+  </form>
+  <div id="ideas"></div>
+  <script>
+    async function loadIdeas() {
+      const res = await fetch('/api/ideas');
+      const data = await res.json();
+      const container = document.getElementById('ideas');
+      container.innerHTML = '';
+      data.ideas.forEach(i => {
+        const div = document.createElement('div');
+        div.className = 'idea';
+        div.textContent = `${i.id}. ${i.title} - ${i.description || ''}`;
+        container.appendChild(div);
+      });
+    }
+    document.getElementById('ideaForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      await fetch('/api/ideas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description })
+      });
+      e.target.reset();
+      loadIdeas();
+    });
+    loadIdeas();
+  </script>
+</body>
+</html>
